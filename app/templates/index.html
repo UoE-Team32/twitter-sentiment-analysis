@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Twitter Sentiment Analysis</title>
+  <meta name="description" content="Sentiment Analysis">
+  <meta name="author" content="Served by Djano">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+</head>
+
+<body>
+  <div class="hero is-dark is-fullheight">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title has-text-weight-light has-text-centered">Twitter Sentiment Analysis</h1>
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>
+  var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'line',
+
+    // The data for our dataset
+    data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+            label: 'My First dataset',
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [0, 10, 5, 2, 20, 30, 45]
+        }]
+    },
+
+    // Configuration options go here
+    options: {}
+});
+</script>
+
+</html>
