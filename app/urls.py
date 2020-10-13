@@ -4,5 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('piechart/', views.pie_chart_endpoint, name='piechart'),
+    path('map/', views.map, name='map'),
+    path('piechart/', views.ChartAnalysisEndpoint.as_view(), name='piechart'),
+    path('worldmap/', views.WorldAnalysisEndpoint.as_view(), name='worldmap'),
 ]
