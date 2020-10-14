@@ -7,13 +7,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def index(request):
-    return render(request, "index.html", context={"title": "Twitter Sentiment Analysis"})
+    return render(request, "index.html", context={"title": "Sentiment Analysis"})
 
 
 def map(request):
-    return render(request, "map.html", context={"title": "Twitter Sentiment Map"})
+    return render(request, "map.html", context={"title": "Sentiment by Country"})
 
 
 class AnalysisEndpointMixin(View):
@@ -75,32 +74,61 @@ class ChartAnalysisEndpoint(AnalysisEndpointMixin):
         if error:
             return error
 
+        location_required = True if 'locationRequired' in request.GET else False
+
         logger.info("Searching Twitter for... ", self.search_query)
 
         for tweet_object in tweepy.Cursor(self.twitter.api.search, q=self.search_query+" -filter:retweets", lang='en', result_type='recent').items(self.maxResults):
+            if (tweet_object.place is None and location_required is True):
+                print("Location is required and place == None")
+                continue
+
             all_tweets.append(tweet_object.text)
-            tweet = analyse_polarity_text(tweet_object.text, tweet_object.place)
+            tweet = analyse_polarity_text(tweet_object.text, tweet_object.place, tweet_object.user)
             if (tweet.polarity == Polarity.POSITIVE):
-                positive_tweets.append(tweet.text)
+                positive_tweets.append(
+                    {
+                        "text": tweet.text,
+                        "location": tweet.country
+                    }
+                )
             elif (tweet.polarity == Polarity.NEUTRAL):
-                netural_tweets.append(tweet.text)
+                netural_tweets.append(
+                    {
+                        "text": tweet.text,
+                        "location": tweet.country
+                    }
+                )
             elif (tweet.polarity == Polarity.NEGATIVE):
-                negative_tweets.append(tweet.text)
+                negative_tweets.append(
+                    {
+                        "text": tweet.text,
+                        "location": tweet.country
+                    }
+                )
+        #using a percentage multiplier variable to save doing multiple calculations
+        if len(all_tweets) > 0:
+            percentage_multiplier = 100/len(all_tweets)
+        else:
+            percentage_multiplier = 0
 
         return JsonResponse(
             {
                 "results": len(all_tweets),
                 "positive": {
                             "number": len(positive_tweets),
-                            "details": positive_tweets
+                            "details": positive_tweets,
+                            "percentage": len(positive_tweets)*percentage_multiplier
                             },
                 "netural": {
                             "number": len(netural_tweets),
-                            "details": netural_tweets
+                            "details": netural_tweets,
+                            "percentage": len(netural_tweets)*percentage_multiplier
                             },
                 "negative": {
                             "number": len(negative_tweets),
-                            "details": negative_tweets
+                            "details": negative_tweets,
+                            "percentage": len(negative_tweets)*percentage_multiplier
                             },
             }
         )

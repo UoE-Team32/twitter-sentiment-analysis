@@ -10,12 +10,44 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.js"></script>
     {% block head %} 
     {% endblock %}
   </head>
 
   <body>
     <div id="app">
+    <div class="hero is-light">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered is-vcentered">
+            <div class="column is-5">
+              <h1 class="title is-1 has-text-weight-light has-text-centered">
+                {{ title }}
+              </h1>
+            </div>
+            <div class="column is-4">
+              <form @submit.prevent="query">
+                  <div class="field has-addons">
+                    <div class="control is-expanded">
+                      <input
+                        class="input is-fullwidth"
+                        type="text"
+                        placeholder="Enter a query..."
+                        v-model="search_term"
+                      />
+                    </div>
+                    <div class="control">
+                      <input type="submit" class="button is-success" value="Search"></input>
+                    </div>
+                  </div>
+                </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
       {% block body %} 
       {% endblock %}
     </div>
