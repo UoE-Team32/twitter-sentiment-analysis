@@ -50,7 +50,7 @@ class StreamListener(tweepy.StreamListener, Twitter):
         if hasattr(status.place, 'id'):
             place = self.api.geo_id(status.place.id)
             location = place.country
+            print(location)
 
-### Streaming ###
 # twitter_stream = twitter.create_stream_listener()
 # twitter_stream.filter(track=['#covid19'], is_async=True)

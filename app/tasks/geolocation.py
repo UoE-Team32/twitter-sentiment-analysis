@@ -23,16 +23,17 @@ def get_boundingbox_country(country, output_as='boundingbox'):
     url = '{0}{1}{2}'.format('http://nominatim.openstreetmap.org/search?country=',
                              country,
                              '&format=json&polygon=0')
-    response = requests.get(url).json()[0]
+    try:
+        response = requests.get(url).json()[0]
+        # parse response to list
+        if output_as == 'boundingbox':
+            lst = response[output_as]
+            output = [float(i) for i in lst]
+        if output_as == 'center':
+            lst = [response.get(key) for key in ['lat', 'lon']]
+            output = [float(i) for i in lst]
+        return output
+    except Exception as e:
+        print("Country Not Found")
 
-    # parse response to list
-    if output_as == 'boundingbox':
-        lst = response[output_as]
-        output = [float(i) for i in lst]
-    if output_as == 'center':
-        lst = [response.get(key) for key in ['lat', 'lon']]
-        output = [float(i) for i in lst]
-    return output
-
-
-print(get_boundingbox_country("United Kingdom", output_as='center'))
+    

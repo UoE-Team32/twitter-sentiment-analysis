@@ -3,16 +3,32 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from utils.twitter import Twitter, tweepy
 from app.tasks.analysis import analyse_polarity_text, Polarity
+from app.tasks.geolocation import get_boundingbox_country
 import logging
+
+from dotenv import load_dotenv
+import os
+
+# Load .env file and associated vars
+load_dotenv()
+GMAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
 logger = logging.getLogger(__name__)
 
+
 def index(request):
-    return render(request, "index.html", context={"title": "Sentiment Analysis"})
+    return render(request, "index.html",
+                  context={"title": "Sentiment Analysis"})
 
 
 def map(request):
-    return render(request, "map.html", context={"title": "Sentiment by Country"})
+    return render(request,
+                  "map.html",
+                  context={
+                            "title": "Sentiment by Country",
+                            "GMAPS_API_KEY": GMAPS_API_KEY
+                           }
+                  )
 
 
 class AnalysisEndpointMixin(View):
@@ -80,33 +96,47 @@ class ChartAnalysisEndpoint(AnalysisEndpointMixin):
 
         for tweet_object in tweepy.Cursor(self.twitter.api.search, q=self.search_query+" -filter:retweets", lang='en', result_type='recent').items(self.maxResults):
             if (tweet_object.place is None and location_required is True):
-                print("Location is required and place == None")
-                continue
+                # print(tweet_object.user.location)
+                if (tweet_object.user.location != ""):
+                    coords = get_boundingbox_country(tweet_object.user.location, output_as='center')
+                    if not coords:
+                        continue
+                else:
+                    continue
+            elif (location_required):
+                # TODO: Turn bounding box into centre
+                coords = tweet_object.place.bounding_box.coordinates
+            else:
+                coords = []
 
+            print(coords)
             all_tweets.append(tweet_object.text)
-            tweet = analyse_polarity_text(tweet_object.text, tweet_object.place, tweet_object.user)
+            tweet = analyse_polarity_text(tweet_object.text, tweet_object.place, tweet_object.user, coords)
             if (tweet.polarity == Polarity.POSITIVE):
                 positive_tweets.append(
                     {
                         "text": tweet.text,
-                        "location": tweet.country
+                        "location": tweet.country,
+                        "coordinates": tweet.coords,
                     }
                 )
             elif (tweet.polarity == Polarity.NEUTRAL):
                 netural_tweets.append(
                     {
                         "text": tweet.text,
-                        "location": tweet.country
+                        "location": tweet.country,
+                        "coordinates": tweet.coords,
                     }
                 )
             elif (tweet.polarity == Polarity.NEGATIVE):
                 negative_tweets.append(
                     {
                         "text": tweet.text,
-                        "location": tweet.country
+                        "location": tweet.country,
+                        "coordinates": tweet.coords,
                     }
                 )
-        #using a percentage multiplier variable to save doing multiple calculations
+        # using a percentage multiplier variable to save doing multiple calculations
         if len(all_tweets) > 0:
             percentage_multiplier = 100/len(all_tweets)
         else:

@@ -12,10 +12,10 @@ class Polarity(Enum):
     NEGATIVE = 3
 
 
-Tweet = namedtuple('Tweet', 'polarity, text, country')
+Tweet = namedtuple('Tweet', 'polarity, text, country, coords')
 
 
-def analyse_polarity_text(text: str, geo: object, usr: object) -> Tweet:
+def analyse_polarity_text(text: str, geo: object, usr: object, coords) -> Tweet:
     # Analyse the tweet
     analysis = TextBlob(text)
     if geo:
@@ -25,11 +25,11 @@ def analyse_polarity_text(text: str, geo: object, usr: object) -> Tweet:
         geo['bounding_box'].pop('_api')
 
     if analysis.sentiment.polarity > 0:
-        logger.debug('Tweet: ' + text + ', Polarity: Positive')
-        return Tweet(polarity=Polarity.POSITIVE, text=text, country=geo)
+        logger.debug('Tweet: ' + text + ', Polarity: Positive' + ', Country: ' + str(geo), str(coords))
+        return Tweet(polarity=Polarity.POSITIVE, text=text, country=geo, coords=coords)
     elif analysis.sentiment.polarity == 0:
-        logger.debug('Tweet: ' + text + ', Polarity: Neutral')
-        return Tweet(polarity=Polarity.NEUTRAL, text=text, country=geo)
+        logger.debug('Tweet: ' + text + ', Polarity: Neutral' + ', Country: ' + str(geo), str(coords))
+        return Tweet(polarity=Polarity.NEUTRAL, text=text, country=geo, coords=coords)
     else:
-        print('Tweet: ' + text + ', Polarity: Negative' + ', Country: ' + str(geo))
-        return Tweet(polarity=Polarity.NEGATIVE, text=text, country=geo)
+        print('Tweet: ' + text + ', Polarity: Negative' + ', Country: ' + str(geo), str(coords))
+        return Tweet(polarity=Polarity.NEGATIVE, text=text, country=geo, coords=coords)
