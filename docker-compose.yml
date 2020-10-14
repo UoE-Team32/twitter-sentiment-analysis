@@ -1,0 +1,11 @@
+version: '3.3'
+services:
+  sentiment-analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    volumes:
+      - './db.sqlite3:/db.sqlite3'
+    restart: always
