@@ -1,4 +1,11 @@
-{% extends "base.html" %} {% block body %}
+{% extends "base.html" %} 
+{% load static %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/index.css' %}">
+{% endblock %}
+
+{% block body %}
 
 <!-- Graph showcase -->
 <div class="hero has-background-grey-lighter">
@@ -16,7 +23,7 @@
           </div>
         </div>
         <div class="column is-4">
-          <div class="box has-text-centered">
+          <div class="box has-text-centered" style="height: 100%">
             <h1 class="title has-text-weight-light">
               Analysis of Tweets
             </h1>
@@ -31,9 +38,9 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td id="pos">0</td>
+                    <td id="neu">0</td>
+                    <td id="neg">0</td>
                   </tr>
                 </tbody>
               </table>
@@ -43,74 +50,11 @@
       </div>
     </div>
   </div>
-
-  <script>
-    var app = new Vue({
-      el: "#app",
-      data() {
-        return {
-          search_term: "",
-          query_limit: 100,
-          data: [1, 1, 1],
-          overallPieChart: null,
-          isLoading: false
-        };
-      },
-      methods: {
-        query() {
-          // Set loading to opposite of itself
-          this.isLoading = !this.isLoading;
-          if (this.isLoading) {
-            alert('Fetching your tweets. Please close (this is for testing only, will replace with a modal later)')
-          }
-
-          axios
-            .get(
-              `http://localhost:8000/app/piechart?q=${this.search_term}&maxResults=${this.query_limit}`
-            )
-            .then((res) => {
-              // It is real hacky, but its a challenge so things shouldnt be done properly in the first place! :)
-              this.data[0] = res.data.positive.number;
-              this.data[1] = res.data.netural.number;
-              this.data[2] = res.data.negative.number;
-
-              // Update the Pie chart
-              var chart = this.overallPieChart; // I am lazy...
-              chart.data.datasets.forEach((dataset) => {
-                dataset.data.push(this.data);
-              });
-              chart.update();
-            })
-            .catch((err) => console.error(err));
-        },
-      },
-      mounted() {
-        // Pie chart data
-        var data = ({
-          datasets: [
-            {
-              data: this.data,  
-              backgroundColor: ['#48c774', '#e6e6e6', '#f14668']
-            },
-          ],
-          
-          // These labels appear in the legend and in the tooltips when hovering different arcs
-          labels: ["Positive", "Neutral", "Negative"],
-        });
-
-        this.overallPieChart = new Chart(document.getElementById("positiveChart").getContext("2d"), {
-          type: 'pie',
-          data: data
-        })
-      }
-    });
-  </script>
+ </div>
+  <script src={% static 'js/index.js' %}></script>
 
   <!-- A bit of individual styling for Box -->
-  <style>
-    .box {
-      height: 100%;
-    }
-  </style>
   {% endblock %}
-</div>
+  {% block footer %}
+  
+  {% endblock %}

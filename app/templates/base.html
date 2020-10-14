@@ -1,16 +1,21 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>{{ title }}</title>
     <meta name="description" content="Sentiment Analysis" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.js"></script>
+    <script src="/static/js/fetchTweets.js"></script>
     {% block head %} 
     {% endblock %}
   </head>
@@ -38,7 +43,7 @@
                       />
                     </div>
                     <div class="control">
-                      <input type="submit" class="button is-success" value="Search"></input>
+                      <input type="submit" class="button is-success" value="Search" id="search_button"></input>
                     </div>
                   </div>
                 </form>
@@ -52,4 +57,38 @@
       {% endblock %}
     </div>
   </body>
+
+  <br />
+  <footer>
+    <div class="container">
+      <div class="columns is-centered is-vcentered">
+      <div class="column is-7">
+        <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <a href={% url 'home' %}>
+            <button class="button is-large is-light">
+              <span class="icon">
+                <i class="fas fa-home"></i>
+              </span>
+            </button>
+          </a>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+           <a href={% url 'map' %}>
+              <button class="button is-large is-light">
+              <span class="icon">
+                <i class="fas fa-globe-americas"></i>
+              </span>
+            </button>
+        </a>
+        </div>
+      </div>
+    </div>
+      </div>
+    </div>
+    </div>
+  </footer>
 </html>
