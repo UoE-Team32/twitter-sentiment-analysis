@@ -16,6 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.js"></script>
+    <script src="https://unpkg.com/bulma-toast"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.0.0/animate.min.css">
     <script src="/static/js/fetchTweets.js"></script>
     {% block head %} 
     {% endblock %}
@@ -42,7 +44,12 @@
                         placeholder="Enter a query..."
                         v-model="search_term"
                       />
+                    </div>                    
+
+                    <div class="control">
+                      <input class="input" type="number" v-model="query_limit" placeholder="Amount to query" min="1" max="500">
                     </div>
+
                     <div class="control">
                       <input type="submit" class="button is-success" value="Search" id="search_button"></input>
                     </div>

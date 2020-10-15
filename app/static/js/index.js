@@ -4,7 +4,7 @@ var app = new Vue({
     data: {
         search_term: "",
         query_limit: 100,
-        data: [1, 1, 1],
+        data: [],
         overallPieChart: null,
         isLoading: false,
         tweets: null
@@ -37,6 +37,9 @@ var app = new Vue({
         document.getElementById("pos").innerHTML = this.data[0];
         document.getElementById("neu").innerHTML = this.data[1];
         document.getElementById("neg").innerHTML = this.data[2];
+
+        // Reset loading
+        this.isLoading = !this.isLoading;
       },
     },
     mounted() {

@@ -1,39 +1,86 @@
 import requests
+from dotenv import load_dotenv
+import os
+
+from app.models import CachedGeoLocation
+
+# Load .env file and associated vars
+load_dotenv()
+API_KEY = os.getenv("MAPQUEST_API_KEY")
 
 
-def get_boundingbox_country(country, output_as='boundingbox'):
+def check_cached_location(location_input: list):
+    for location in location_input:
+        location = location.lower()
+        try:
+            obj = CachedGeoLocation.objects.get(name=location)
+            return [obj.lat, obj.lng]
+        except Exception:
+            return None
+
+
+def get_coords_location(location_input: list):
     """
-    get the bounding box of a country in EPSG4326 given a country name
+    get the coordinates of a location in EPSG4326 given a location string
 
     Parameters
     ----------
     country : str
-        name of the country in english and lowercase
-    output_as : 'str
-        chose from 'boundingbox' or 'center'. 
-         - 'boundingbox' for [latmin, latmax, lonmin, lonmax]
-         - 'center' for [latcenter, loncenter]
+        name of the place to search for
 
     Returns
     -------
     output : list
-        list with coordinates as str
+        list with coordinates as str if one result given else
+        list with dictionaries of places with coordinates as str
     """
-    # create url
-    url = '{0}{1}{2}'.format('http://nominatim.openstreetmap.org/search?country=',
-                             country,
-                             '&format=json&polygon=0')
-    try:
-        response = requests.get(url).json()[0]
-        # parse response to list
-        if output_as == 'boundingbox':
-            lst = response[output_as]
-            output = [float(i) for i in lst]
-        if output_as == 'center':
-            lst = [response.get(key) for key in ['lat', 'lon']]
-            output = [float(i) for i in lst]
-        return output
-    except Exception as e:
-        print("Country Not Found")
+    url = "https://open.mapquestapi.com/geocoding/v1"
+    valid_us_strings = ["usa", "us", "united states of america", "united states"]
 
-    
+    cached_location = check_cached_location(location_input)
+
+    if cached_location:
+        return cached_location
+
+    if len(location_input) == 1:
+        location_input = str(location_input[0])
+        url += "/address?key=%s&location='%s'" % (API_KEY, location_input)
+        print("GET " + url)
+        try:
+            response = requests.get(url).json()
+            output = [
+                response["results"][0]["locations"][0]["latLng"]["lat"],
+                response["results"][0]["locations"][0]["latLng"]["lng"],
+            ]
+            if output == [39.78373, -100.445882]:
+                if location_input.strip().lower() not in valid_us_strings:
+                    return []
+            cached_location = CachedGeoLocation(
+                name=location_input.strip().lower(), lat=output[0], lng=output[1]
+            )
+            cached_location.save()
+            return output
+        except Exception as e:
+            print("%s coords not found. ERROR:" % location_input[0], e)
+    else:
+        location_input_str = ""
+        for country in location_input:
+            location_input_str += "&location='%s'" % country
+        url += "/batch?key=%s%s" % (API_KEY, location_input_str)
+        print("GET " + url)
+        try:
+            response = requests.get(url).json()
+            results = response["results"]
+            output = []
+            for location_name, result in zip(location_input, results):
+                output.append(
+                    {
+                        location_name: [
+                            result["locations"][0]["latLng"]["lat"],
+                            result["locations"][0]["latLng"]["lng"],
+                        ]
+                    }
+                )
+            return output
+        except Exception as e:
+            print("%s coords not found. ERROR:" % location_input, e)
