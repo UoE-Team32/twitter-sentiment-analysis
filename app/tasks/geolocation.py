@@ -1,12 +1,11 @@
 import requests
-from dotenv import load_dotenv
-import os
+import environ
 
 from app.models import CachedGeoLocation
 
 # Load .env file and associated vars
-load_dotenv()
-API_KEY = os.getenv("MAPQUEST_API_KEY")
+env = environ.Env()
+API_KEY = env.str("MAPQUEST_API_KEY")
 
 
 def check_cached_location(location_input: list):

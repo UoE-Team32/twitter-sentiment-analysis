@@ -27,15 +27,4 @@ jobs:
         pip install -r requirements.txt 
     - name: Lint with flake8
       run: |
-        flake8 .
-    - name: Run Tests
-      env:
-        CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-        CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-        MAPQUEST_API_KEY: ${{ secrets.MAPQUEST_API_KEY }}
-      run: |
-        python manage.py test
-      
+        flake8 .      

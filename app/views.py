@@ -6,12 +6,11 @@ from app.tasks.analysis import analyse_polarity_text, Polarity
 from app.tasks.geolocation import get_coords_location
 import logging
 
-from dotenv import load_dotenv
-import os
+import environ
 
 # Load .env file and associated vars
-load_dotenv()
-GMAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+env = environ.Env()
+GMAPS_API_KEY = env.str("GOOGLE_MAPS_API_KEY")
 
 logger = logging.getLogger(__name__)
 

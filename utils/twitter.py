@@ -1,13 +1,12 @@
 import tweepy
-import os
-from dotenv import load_dotenv
+import environ
 
 # Load .env file and associated vars
-load_dotenv()
-CONSUMER_KEY = os.getenv("CONSUMER_KEY")
-CONSUMER_SECRET = os.getenv("CONSUMER_SECRET")
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
-ACCESS_TOKEN_SECRET = os.getenv("ACCESS_TOKEN_SECRET")
+env = environ.Env()
+CONSUMER_KEY = env.str("CONSUMER_KEY")
+CONSUMER_SECRET = env.str("CONSUMER_SECRET")
+ACCESS_TOKEN = env.str("ACCESS_TOKEN")
+ACCESS_TOKEN_SECRET = env.str("ACCESS_TOKEN_SECRET")
 
 
 class Twitter:
